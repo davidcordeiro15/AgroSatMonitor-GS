@@ -1,7 +1,13 @@
 # 🌱 AgroSatMonitor API
 
-> **Sistema de Monitoramento Agrícola com Dados de Satélite e Clima**  
+> **Sistema de Monitoramento Agrícola com Dados de Satélite e Clima**
 
+## 📋 Equipe
+557538 – David Cordeiro
+555619 – Tiago Morais
+557065 – Vinicius Augusto
+556892 – Guilherme 
+99856 – Marchel Augusto
 
 ---
 
