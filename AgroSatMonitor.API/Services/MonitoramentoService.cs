@@ -30,14 +30,12 @@ namespace AgroSatMonitor.API.Services
 
             var alertasGerados = new List<AlertaAgricola>();
 
-            // Busca último monitoramento climático
             var ultimoClima = await _context.MonitoramentosClimaticos
                 .AsNoTracking()
                 .Where(m => m.FazendaId == fazendaId)
                 .OrderByDescending(m => m.DataLeitura)
                 .FirstOrDefaultAsync();
 
-            // Busca último monitoramento de vegetação
             var ultimaVegetacao = await _context.MonitoramentosVegetacao
                 .AsNoTracking()
                 .Where(m => m.FazendaId == fazendaId)
@@ -45,22 +43,14 @@ namespace AgroSatMonitor.API.Services
                 .FirstOrDefaultAsync();
 
             if (ultimoClima != null)
-            {
                 alertasGerados.AddRange(VerificarAlertasClimaticos(fazendaId, ultimoClima));
-            }
 
             if (ultimaVegetacao != null)
-            {
                 alertasGerados.AddRange(VerificarAlertasVegetacao(fazendaId, ultimaVegetacao));
-            }
 
             if (!alertasGerados.Any())
-            {
-                // Sem dados de monitoramento → retorna alertas já armazenados
                 return await ObterAlertasArmazenadosAsync(fazendaId, fazenda.Nome);
-            }
 
-            // Persiste novos alertas
             _context.Alertas.AddRange(alertasGerados);
             await _context.SaveChangesAsync();
 
@@ -69,7 +59,8 @@ namespace AgroSatMonitor.API.Services
 
         public async Task<IEnumerable<HistoricoConsultaResponseDto>> ObterHistoricoConsultasAsync(int fazendaId)
         {
-            if (!await _context.Fazendas.AnyAsync(f => f.Id == fazendaId))
+            // CountAsync > 0 evita ORA-00904 causado por AnyAsync gerar literal FALSE no Oracle pré-23c
+            if (await _context.Fazendas.CountAsync(f => f.Id == fazendaId) == 0)
                 throw new FazendaNaoEncontradaException(fazendaId);
 
             var historico = await _context.HistoricosConsulta
@@ -95,7 +86,6 @@ namespace AgroSatMonitor.API.Services
             var alertas = new List<AlertaAgricola>();
             var agora = DateTime.UtcNow;
 
-            // Alerta de temperatura extrema (> 38°C ou < 5°C)
             if (clima.Temperatura > 38)
             {
                 alertas.Add(new AlertaAgricola
@@ -121,7 +111,6 @@ namespace AgroSatMonitor.API.Services
                 });
             }
 
-            // Alerta de seca (precipitação zero e umidade < 30%)
             if (clima.Precipitacao == 0 && clima.Umidade < 30)
             {
                 alertas.Add(new AlertaAgricola
@@ -135,7 +124,6 @@ namespace AgroSatMonitor.API.Services
                 });
             }
 
-            // Alerta de chuva excessiva (> 50mm)
             if (clima.Precipitacao > 50)
             {
                 alertas.Add(new AlertaAgricola
@@ -149,7 +137,6 @@ namespace AgroSatMonitor.API.Services
                 });
             }
 
-            // Alerta de vento forte (> 60 km/h)
             if (clima.VelocidadeVento > 60)
             {
                 alertas.Add(new AlertaAgricola
@@ -170,7 +157,6 @@ namespace AgroSatMonitor.API.Services
         {
             var alertas = new List<AlertaAgricola>();
 
-            // Alerta de baixa vegetação (NDVI < 0.25)
             if (veg.Ndvi < 0.25)
             {
                 alertas.Add(new AlertaAgricola

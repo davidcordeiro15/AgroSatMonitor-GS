@@ -18,10 +18,12 @@ namespace AgroSatMonitor.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configura TPC (Table Per Concrete Type) para a hierarquia de MonitoramentoBase
-            // Cada subclasse terá sua própria tabela Oracle
-            modelBuilder.Entity<MonitoramentoBase>()
-                .UseTpcMappingStrategy();
+            // ── HIERARQUIA DE MONITORAMENTO ───────────────────────────────────────────
+            // HasBaseType(null) instrui o EF Core a tratar cada entidade concreta como
+            // entidade raiz independente, evitando queries TPC com UNION ALL que causam
+            // ORA-00904 no Oracle pré-23c. A herança C# permanece intacta para POO.
+            modelBuilder.Entity<MonitoramentoClimatico>().HasBaseType((Type?)null);
+            modelBuilder.Entity<MonitoramentoVegetacao>().HasBaseType((Type?)null);
 
             // ── FAZENDA ───────────────────────────────────────────────────────────────
             modelBuilder.Entity<Fazenda>(entity =>
@@ -79,6 +81,7 @@ namespace AgroSatMonitor.API.Data
             modelBuilder.Entity<MonitoramentoClimatico>(entity =>
             {
                 entity.ToTable("TB_MON_CLIMATICO");
+                entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnName("ID_MON_CLI").ValueGeneratedOnAdd();
                 entity.Property(e => e.FazendaId).HasColumnName("ID_FAZENDA");
                 entity.Property(e => e.Latitude).HasColumnName("NR_LATITUDE");
@@ -89,12 +92,18 @@ namespace AgroSatMonitor.API.Data
                 entity.Property(e => e.Precipitacao).HasColumnName("NR_PRECIPITACAO");
                 entity.Property(e => e.VelocidadeVento).HasColumnName("NR_VEL_VENTO");
                 entity.Property(e => e.DataLeitura).HasColumnName("DT_LEITURA");
+
+                entity.HasOne(e => e.Fazenda)
+                      .WithMany(f => f.MonitoramentosClimaticos)
+                      .HasForeignKey(e => e.FazendaId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // ── MONITORAMENTO VEGETACAO ───────────────────────────────────────────────
             modelBuilder.Entity<MonitoramentoVegetacao>(entity =>
             {
                 entity.ToTable("TB_MON_VEGETACAO");
+                entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnName("ID_MON_VEG").ValueGeneratedOnAdd();
                 entity.Property(e => e.FazendaId).HasColumnName("ID_FAZENDA");
                 entity.Property(e => e.Latitude).HasColumnName("NR_LATITUDE");
@@ -103,6 +112,11 @@ namespace AgroSatMonitor.API.Data
                 entity.Property(e => e.Ndvi).HasColumnName("NR_NDVI");
                 entity.Property(e => e.NivelSaudeVegetacao).HasColumnName("TP_NIVEL_SAUDE").HasConversion<int>();
                 entity.Property(e => e.DataLeitura).HasColumnName("DT_LEITURA");
+
+                entity.HasOne(e => e.Fazenda)
+                      .WithMany(f => f.MonitoramentosVegetacao)
+                      .HasForeignKey(e => e.FazendaId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // ── ALERTA AGRICOLA ───────────────────────────────────────────────────────
@@ -127,7 +141,7 @@ namespace AgroSatMonitor.API.Data
                 entity.Property(h => h.EndpointConsultado).HasColumnName("DS_ENDPOINT").HasMaxLength(300);
                 entity.Property(h => h.DataConsulta).HasColumnName("DT_CONSULTA");
                 entity.Property(h => h.TempoRespostaMs).HasColumnName("NR_TEMPO_RESP_MS");
-                entity.Property(h => h.Sucesso).HasColumnName("FL_SUCESSO");
+                entity.Property(h => h.Sucesso).HasColumnName("FL_SUCESSO").HasConversion<int>();
                 entity.Property(h => h.FazendaId).HasColumnName("ID_FAZENDA");
             });
         }

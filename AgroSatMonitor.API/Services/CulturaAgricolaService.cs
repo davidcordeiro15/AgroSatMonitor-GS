@@ -31,7 +31,8 @@ namespace AgroSatMonitor.API.Services
 
         public async Task<IEnumerable<CulturaAgricolaResponseDto>> ObterPorFazendaAsync(int fazendaId)
         {
-            if (!await _context.Fazendas.AnyAsync(f => f.Id == fazendaId))
+            
+            if (await _context.Fazendas.CountAsync(f => f.Id == fazendaId) == 0)
                 throw new FazendaNaoEncontradaException(fazendaId);
 
             var culturas = await _context.Culturas
@@ -57,7 +58,8 @@ namespace AgroSatMonitor.API.Services
 
         public async Task<CulturaAgricolaResponseDto> CriarAsync(CulturaAgricolaRequestDto dto)
         {
-            if (!await _context.Fazendas.AnyAsync(f => f.Id == dto.FazendaId))
+           
+            if (await _context.Fazendas.CountAsync(f => f.Id == dto.FazendaId) == 0)
                 throw new FazendaNaoEncontradaException(dto.FazendaId);
 
             _logger.LogInformation("Criando cultura {Nome} para fazenda ID={FazendaId}", dto.Nome, dto.FazendaId);
@@ -82,7 +84,8 @@ namespace AgroSatMonitor.API.Services
             var cultura = await _context.Culturas.FindAsync(id)
                 ?? throw new CulturaNaoEncontradaException(id);
 
-            if (!await _context.Fazendas.AnyAsync(f => f.Id == dto.FazendaId))
+            
+            if (await _context.Fazendas.CountAsync(f => f.Id == dto.FazendaId) == 0)
                 throw new FazendaNaoEncontradaException(dto.FazendaId);
 
             cultura.Nome = dto.Nome;
