@@ -1,7 +1,7 @@
 # 🌱 AgroSatMonitor API
 
 > **Sistema de Monitoramento Agrícola com Dados de Satélite e Clima**  
-> Projeto Acadêmico — FIAP Pós-Graduação em Inteligência Artificial para Devs
+
 
 ---
 
