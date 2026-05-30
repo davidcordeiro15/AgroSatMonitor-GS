@@ -4,9 +4,13 @@
 
 ## 📋 Equipe
 557538 – David Cordeiro
+
 555619 – Tiago Morais
+
 557065 – Vinicius Augusto
+
 556892 – Guilherme 
+
 99856 – Marchel Augusto
 
 ---
