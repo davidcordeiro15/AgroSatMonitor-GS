@@ -430,7 +430,7 @@ graph TB
 
 ```mermaid
 flowchart TD
-    A([Início: GET /api/monitoramento/clima/{id}]) --> B{Fazenda existe?}
+    A(["Início: GET /api/monitoramento/clima/{fazendaId}"]) --> B{Fazenda existe?}
     B -->|Não| ERR1[404 FazendaNaoEncontradaException]
     B -->|Sim| C[Buscar coordenadas da fazenda]
     C --> D[Chamar Open-Meteo API]
@@ -441,7 +441,7 @@ flowchart TD
     F --> G[Persistir MonitoramentoClimatico no Oracle]
     G --> H[Salvar HistoricoConsulta]
     H --> I[Mapear para DTO de resposta]
-    I --> J([200 OK — Dados climáticos])
+    I --> J(["200 OK — Dados climáticos"])
 
     style A fill:#28a745,color:#fff
     style J fill:#007bff,color:#fff
@@ -449,7 +449,6 @@ flowchart TD
     style ERR2 fill:#dc3545,color:#fff
     style ERR3 fill:#dc3545,color:#fff
 ```
-
 ---
 
 ## 🗃️ Diagrama de Entidades
