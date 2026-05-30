@@ -2,7 +2,7 @@
 
 > **Sistema de Monitoramento Agrícola com Dados de Satélite e Clima**
 
-## 📋 Equipe
+##  Equipe
 557538 – David Cordeiro
 
 555619 – Tiago Morais
