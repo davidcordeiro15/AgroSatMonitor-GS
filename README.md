@@ -674,4 +674,4 @@ O sistema está preparado para usar a API **AgroMonitoring** para dados de saté
 
 ---
 
-*Desenvolvido para fins acadêmicos — FIAP 2025*
+*Desenvolvido para fins acadêmicos — FIAP 2026*
